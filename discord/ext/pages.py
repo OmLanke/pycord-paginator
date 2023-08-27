@@ -37,6 +37,8 @@ __all__ = (
     "Page",
 )
 
+# TODO: Try to use EAFP style
+
 
 class PaginatorButton(discord.ui.Button):
     """Creates a button used to navigate the paginator.
@@ -65,7 +67,7 @@ class PaginatorButton(discord.ui.Button):
 
     def __init__(
         self,
-        button_type: str,
+        button_type: str,  # TODO: Use enums
         label: str = None,
         emoji: str | discord.Emoji | discord.PartialEmoji = None,
         style: discord.ButtonStyle = discord.ButtonStyle.green,
@@ -145,7 +147,7 @@ class Page:
         embeds: list[list[discord.Embed] | discord.Embed] | None = None,
         custom_view: discord.ui.View | None = None,
         files: list[discord.File] | None = None,
-        **kwargs,
+        **kwargs,  # TODO: Why is this here
     ):
         if content is None and embeds is None:
             raise discord.InvalidArgument(
@@ -178,6 +180,7 @@ class Page:
             file.fp.close = lambda: None
         return self._files
 
+    # TODO: Use normal attributes instead of properties
     @property
     def content(self) -> str | None:
         """Gets the content for the page."""
@@ -368,6 +371,9 @@ class Paginator(discord.ui.View):
         The message the paginator is attached to.
     """
 
+    # TODO: Add Paginator.prepare
+    # TODO: Add override for View.to_components, to allow sending as a view
+
     def __init__(
         self,
         pages: (
@@ -380,7 +386,7 @@ class Paginator(discord.ui.View):
         show_indicator=True,
         show_menu=False,
         menu_placeholder: str = "Select Page Group",
-        author_check=True,
+        author_check=True,  # TODO: default to False
         disable_on_timeout=True,
         use_default_buttons=True,
         default_button_row: int = 0,
@@ -389,6 +395,7 @@ class Paginator(discord.ui.View):
         timeout: float | None = 180.0,
         custom_buttons: list[PaginatorButton] | None = None,
         trigger_on_display: bool | None = None,
+        # TODO: Accept users here
     ) -> None:
         super().__init__(timeout=timeout)
         self.timeout: float = timeout
@@ -407,6 +414,8 @@ class Paginator(discord.ui.View):
 
         if all(isinstance(pg, PageGroup) for pg in pages):
             self.page_groups = self.pages if show_menu else None
+
+            # TODO: Improve logic
             if sum(pg.default is True for pg in self.page_groups) > 1:
                 raise ValueError("Only one PageGroup can be set as the default.")
             for pg in self.page_groups:
@@ -418,7 +427,7 @@ class Paginator(discord.ui.View):
             )
 
         self.page_count = max(len(self.pages) - 1, 0)
-        self.buttons = {}
+        self.buttons = {}  # TODO: Figure out the structure of this and improve it
         self.custom_buttons: list = custom_buttons
         self.show_disabled = show_disabled
         self.show_indicator = show_indicator
@@ -440,7 +449,7 @@ class Paginator(discord.ui.View):
             self.add_menu()
 
         self.usercheck = author_check
-        self.user = None
+        self.user = None  # TODO: make this a list
 
     async def update(
         self,
@@ -520,6 +529,8 @@ class Paginator(discord.ui.View):
         self.show_menu = show_menu if show_menu is not None else self.show_menu
         if pages is not None and all(isinstance(pg, PageGroup) for pg in pages):
             self.page_groups = self.pages if self.show_menu else None
+
+            # TODO: Improve logic
             if sum(pg.default is True for pg in self.page_groups) > 1:
                 raise ValueError("Only one PageGroup can be set as the default.")
             for pg in self.page_groups:
@@ -529,9 +540,13 @@ class Paginator(discord.ui.View):
             self.pages: list[Page] = self.get_page_group_content(
                 self.page_groups[self.default_page_group]
             )
+
         self.page_count = max(len(self.pages) - 1, 0)
-        self.current_page = current_page if current_page <= self.page_count else 0
+        self.current_page = (
+            current_page if current_page <= self.page_count else 0
+        )  # TODO: Loop pages here
         # Apply config changes, if specified
+        # TODO: Avoid ternary operators
         self.show_disabled = (
             show_disabled if show_disabled is not None else self.show_disabled
         )
@@ -569,7 +584,7 @@ class Paginator(discord.ui.View):
             self.buttons = {}
             for button in custom_buttons:
                 self.add_button(button)
-        else:
+        else:  # TODO: Check if this is needed. The previous buttons should be retained
             self.buttons = {}
             self.add_default_buttons()
 
@@ -577,6 +592,7 @@ class Paginator(discord.ui.View):
 
     async def on_timeout(self) -> None:
         """Disables all buttons when the view times out."""
+        # TODO: try-except this
         if self.disable_on_timeout:
             for item in self.children:
                 item.disabled = True
@@ -603,6 +619,7 @@ class Paginator(discord.ui.View):
         page: Optional[Union[:class:`str`, Union[List[:class:`discord.Embed`], :class:`discord.Embed`]]]
             The page content to show after disabling the paginator.
         """
+        # TODO: Add a way for user to just disable without editing?
         page = self.get_page_content(page)
         for item in self.children:
             if (
@@ -692,7 +709,7 @@ class Paginator(discord.ui.View):
         files = page.update_files()
 
         if interaction:
-            await interaction.response.defer()  # needed to force webhook message edit route for files kwarg support
+            await interaction.response.defer()  # needed to force webhook message edit route for files kwarg support # TODO: Check if this is still needed
             await interaction.followup.edit_message(
                 message_id=self.message.id,
                 content=page.content,
@@ -767,7 +784,7 @@ class Paginator(discord.ui.View):
     def add_button(self, button: PaginatorButton):
         """Adds a :class:`PaginatorButton` to the paginator."""
         self.buttons[button.button_type] = {
-            "object": discord.ui.Button(
+            "object": discord.ui.Button(  # TODO: Figure out why a new object is being created
                 style=button.style,
                 label=(
                     button.label
@@ -810,6 +827,7 @@ class Paginator(discord.ui.View):
         Dict[:class:`str`, Dict[:class:`str`, Union[:class:`~PaginatorButton`, :class:`bool`]]]
             The dictionary of buttons that were updated.
         """
+        # TODO: Cleanup whatever the fuck this is 💀
         for key, button in self.buttons.items():
             if key == "first":
                 if self.current_page <= 1:
@@ -921,14 +939,15 @@ class Paginator(discord.ui.View):
 
     async def send(
         self,
-        ctx: Context,
-        target: discord.abc.Messageable | None = None,
-        target_message: str | None = None,
+        ctx: Context,  # TODO: Accept Messageable
+        target: discord.abc.Messageable | None = None,  # TODO: Remove
+        target_message: str | None = None,  # TODO: Remove
         reference: None
         | (discord.Message | discord.MessageReference | discord.PartialMessage) = None,
         allowed_mentions: discord.AllowedMentions | None = None,
         mention_author: bool | None = None,
         delete_after: float | None = None,
+        # TODO: Accept *args and **kwargs to pass when sending, instead of the above paramters
     ) -> discord.Message:
         """Sends a message with the paginated items.
 
@@ -1020,7 +1039,7 @@ class Paginator(discord.ui.View):
 
         return self.message
 
-    async def edit(
+    async def edit(  # TODO: Copy #2105
         self,
         message: discord.Message,
         suppress: bool | None = None,
@@ -1090,10 +1109,11 @@ class Paginator(discord.ui.View):
 
     async def respond(
         self,
-        interaction: discord.Interaction | BridgeContext,
+        interaction: discord.Interaction
+        | BridgeContext,  # TODO: Accept ApplicationContext
         ephemeral: bool = False,
-        target: discord.abc.Messageable | None = None,
-        target_message: str = "Paginator sent!",
+        target: discord.abc.Messageable | None = None,  # TODO: Remove
+        target_message: str = "Paginator sent!",  # TODO Remove
     ) -> discord.Message | discord.WebhookMessage:
         """Sends an interaction response or followup with the paginated items.
 
@@ -1147,6 +1167,7 @@ class Paginator(discord.ui.View):
         if page_content.custom_view:
             self.update_custom_view(page_content.custom_view)
 
+        # TODO: Cleanup and use interaction.respond
         if isinstance(interaction, discord.Interaction):
             self.user = interaction.user
 
@@ -1171,7 +1192,9 @@ class Paginator(discord.ui.View):
                 # convert from WebhookMessage to Message reference to bypass
                 # 15min webhook token timeout (non-ephemeral messages only)
                 if not ephemeral:
-                    msg = await msg.channel.fetch_message(msg.id)
+                    msg = await msg.channel.fetch_message(
+                        msg.id
+                    )  # TODO: Check if this can use PartialMessage
             else:
                 msg = await interaction.response.send_message(
                     content=page_content.content,
@@ -1201,7 +1224,9 @@ class Paginator(discord.ui.View):
         if isinstance(msg, (discord.Message, discord.WebhookMessage)):
             self.message = msg
         elif isinstance(msg, discord.Interaction):
-            self.message = await msg.original_response()
+            self.message = (
+                await msg.original_response()
+            )  # TODO: Try avoid this and work with Interactions wherever possible
 
         return self.message
 
