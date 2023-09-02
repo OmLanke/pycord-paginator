@@ -1,10 +1,18 @@
+from __future__ import annotations
 from enum import Enum
 from typing import TYPE_CHECKING
 
 import discord
 
 if TYPE_CHECKING:
-    from .pages import Paginator, PageGroup
+    from .pages import PageGroup
+    from .paginator import Paginator
+
+__all__ = (
+    "PaginatorButtonType",
+    "PaginatorButton",
+    "PaginatorMenu",
+)
 
 
 class PaginatorButtonType(Enum):
@@ -43,13 +51,13 @@ class PaginatorButton(discord.ui.Button):
     def __init__(
         self,
         button_type: PaginatorButtonType,
-        label: str = None,
-        emoji: str | discord.Emoji | discord.PartialEmoji = None,
+        label: str | None = None,
+        emoji: str | discord.Emoji | discord.PartialEmoji | None = None,
         style: discord.ButtonStyle = discord.ButtonStyle.green,
         disabled: bool = False,
-        custom_id: str = None,
+        custom_id: str | None = None,
         row: int = 0,
-        loop_label: str = None,
+        loop_label: str | None = None,
     ):
         super().__init__(
             label=label if label or emoji else button_type.name.capitalize(),
@@ -67,7 +75,7 @@ class PaginatorButton(discord.ui.Button):
         # self.disabled = disabled
         self.loop_label = self.label if not loop_label else loop_label
         self.hidden = disabled
-        self.paginator: Paginator | None = None
+        self.paginator: Paginator  # | None = None
 
     async def callback(self, interaction: discord.Interaction):
         """|coro|
@@ -123,7 +131,7 @@ class PaginatorMenu(discord.ui.Select):
         custom_id: str | None = None,
     ):
         self.page_groups = page_groups
-        self.paginator: Paginator | None = None
+        self.paginator: Paginator  # | None = None
         opts = [
             discord.SelectOption(
                 label=page_group.label,
