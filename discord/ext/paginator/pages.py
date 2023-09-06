@@ -103,14 +103,14 @@ class PageGroup:
 
     Parameters
     ----------
-    pages: Union[List[:class:`str`], List[:class:`Page`], List[Union[List[:class:`discord.Embed`], :class:`discord.Embed`]]]
+    pages: Union[List[:class:`str`], List[:class:`Page`], List[:class:`discord.Embed`], List[:class:`discord.Embed`]]
         The list of :class:`Page` objects, strings, embeds, or list of embeds to include in the page group.
     label: :class:`str`
         The label shown on the corresponding PaginatorMenu dropdown option.
         Also used as the SelectOption value.
     description: Optional[:class:`str`]
         The description shown on the corresponding PaginatorMenu dropdown option.
-    emoji: Union[:class:`str`, :class:`discord.Emoji`, :class:`discord.PartialEmoji`]
+    emoji: Optional[:class:`str`, :class:`discord.Emoji`, :class:`discord.PartialEmoji`]
         The emoji shown on the corresponding PaginatorMenu dropdown option.
     default: Optional[:class:`bool`]
         Whether the page group should be the default page group initially shown when the paginator response is sent.

@@ -28,9 +28,8 @@ class PaginatorButton(discord.ui.Button):
 
     Parameters
     ----------
-    button_type: :class:`str`
+    button_type: :class:`PaginatorButtonType`
         The type of button being created.
-        Must be one of ``first``, ``prev``, ``next``, ``last``, or ``page_indicator``.
     label: :class:`str`
         The label shown on the button.
         Defaults to a capitalized version of ``button_type`` (e.g. "Next", "Prev", etc.)
@@ -46,6 +45,12 @@ class PaginatorButton(discord.ui.Button):
     paginator: :class:`Paginator`
         The paginator class where this button is being used.
         Assigned to the button when ``Paginator.add_button`` is called.
+    base_label: :class:`str`
+        The label shown on the button when ``loop_pages`` is set to ``False`` in the Paginator class.
+        This is initialized to the ``label`` parameter, but can be changed later.
+    hidden: :class:`bool`
+        Whether the button is hidden or not.
+        This is initialized to the ``disabled`` parameter, but can be changed later.
     """
 
     def __init__(
@@ -68,11 +73,7 @@ class PaginatorButton(discord.ui.Button):
             row=row,
         )
         self.button_type = button_type
-        # self.label = label if label or emoji else button_type.name.capitalize()
-        self._label = str(self.label)
-        # self.emoji: str | discord.Emoji | discord.PartialEmoji = emoji
-        # self.style = style
-        # self.disabled = disabled
+        self.base_label = str(self.label) if self.label else None
         self.loop_label = self.label if not loop_label else loop_label
         self.hidden = disabled
         self.paginator: Paginator  # | None = None
