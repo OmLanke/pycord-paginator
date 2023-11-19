@@ -450,7 +450,7 @@ class Paginator(discord.ui.View, Mapping):
 
         if interaction:
             # await interaction.response.defer()  # needed to force webhook message edit route for files kwarg support # TODO: Check if this is still needed
-            await interaction.response.edit_message(
+            await interaction.edit(
                 # message_id=self.message.id,
                 **self,
                 attachments=[],
