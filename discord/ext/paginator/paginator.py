@@ -446,18 +446,18 @@ class Paginator(discord.ui.View, Mapping):
             The message associated with the paginator.
         """
         self.current_page = page_number
-        self._prepare(True)
+        data = self._prepare(True)
 
         if interaction:
             # await interaction.response.defer()  # needed to force webhook message edit route for files kwarg support # TODO: Check if this is still needed
             await interaction.response.edit_message(
                 # message_id=self.message.id,
-                **self,
+                **data,
                 attachments=[],
             )
         else:
             await self.message.edit(
-                **self,
+                **data,
                 attachments=[],
             )
         if self.trigger_on_display:
